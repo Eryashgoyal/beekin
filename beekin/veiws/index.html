@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Openings</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        p {
+            margin-bottom: 20px;
+            color: #555;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            margin: 10px 0;
+            cursor: pointer;
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        li:hover {
+            text-decoration: underline;
+        }
+
+        #jobDetails {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Job Openings</h1>
+    <p>We have the following job openings listed:</p>
+    <ul id="jobList"></ul>
+    <div id="jobDetails"></div>
+
+    <script>
+        function fetchJobOpenings() {
+            fetch('http://localhost:3000/getjob')
+                .then(response => response.json())
+                .then(data => {
+                    const jobList = document.getElementById('jobList');
+                    jobList.innerHTML = '';
+                    data.forEach(job => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = job.title;
+                        listItem.addEventListener('click', () => {
+                            fetchJobDetails(job.id);
+                        });
+                        jobList.appendChild(listItem);
+                    });
+                })
+                .catch(error => console.error('Error fetching job openings:', error));
+        }
+
+        function fetchJobDetails(jobId) {
+            fetch(`http://localhost:3000/getjobByid?id=${jobId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const jobDetails = document.getElementById('jobDetails');
+                    jobDetails.innerHTML = `<h2>${data.title}</h2>
+                                            <p>${data.description}</p>
+                                            <p>Location: ${data.location}</p>
+                                            <p>Salary: ${data.salary}</p>`;
+                })
+                .catch(error => console.error('Error fetching job details:', error));
+        }
+
+        fetchJobOpenings();
+    </script>
+</body>
+</html>
